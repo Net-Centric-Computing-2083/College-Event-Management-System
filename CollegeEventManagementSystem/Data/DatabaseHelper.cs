@@ -157,3 +157,5 @@ namespace CollegeEventManagementSystem.Data
         }
     }
 }
+"" 
+"// Reviewed by Samriddha Poudel: ADO.NET helper methods verified (connection, query execution, error handling)." 

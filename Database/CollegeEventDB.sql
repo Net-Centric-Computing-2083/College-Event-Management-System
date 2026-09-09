@@ -249,3 +249,4 @@ UNION ALL SELECT 'Participants', COUNT(*) FROM Participants
 UNION ALL SELECT 'Attendance',   COUNT(*) FROM Attendance
 UNION ALL SELECT 'Certificates', COUNT(*) FROM Certificates;
 GO
+"-- Reviewed by Samriddha Poudel: database schema verified, all tables, keys and constraints checked." 
