@@ -382,6 +382,5 @@ namespace CollegeEventManagementSystem.Forms
         }
     }
 }
- 
- / /   R e v i e w e d   b y   S a m i r   K h a t r i :   a t t e n d a n c e   r e c o r d i n g   a n d   d u p l i c a t e - d a t e   p r e v e n t i o n   v e r i f i e d .  
- 
+
+// Reviewed by Samir Khatri: attendance recording and duplicate-date prevention verified.
