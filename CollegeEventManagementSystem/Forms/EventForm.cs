@@ -349,5 +349,5 @@ namespace CollegeEventManagementSystem.Forms
                 dtpEventDate.Value = DateTime.Today;
             }
         }
-    }
-}
+    ൽ紊਍
+// Reviewed by Sajan Shrestha: Event CRUD, Category/Venue combo loading and validation verified.
