@@ -351,3 +351,6 @@ namespace CollegeEventManagementSystem.Forms
         }
     }
 }
+ 
+ / /   R e v i e w e d   b y   S a j a n   S h r e s t h a :   E v e n t   C R U D ,   C a t e g o r y / V e n u e   c o m b o   l o a d i n g   a n d   v a l i d a t i o n   v e r i f i e d .  
+ 
