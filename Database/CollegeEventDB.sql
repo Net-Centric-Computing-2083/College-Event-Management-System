@@ -250,3 +250,6 @@ UNION ALL SELECT 'Attendance',   COUNT(*) FROM Attendance
 UNION ALL SELECT 'Certificates', COUNT(*) FROM Certificates;
 GO
 "-- Reviewed by Samriddha Poudel: database schema verified, all tables, keys and constraints checked." 
+ 
+ - -   R e v i e w e d   b y   S a m r i d d h a   P o u d e l :   d a t a b a s e   s c h e m a   v e r i f i e d ,   a l l   t a b l e s ,   k e y s   a n d   c o n s t r a i n t s   c h e c k e d .  
+ 
