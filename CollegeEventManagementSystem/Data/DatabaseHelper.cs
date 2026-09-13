@@ -16,9 +16,16 @@ namespace CollegeEventManagementSystem.Data
         /// </summary>
         public static string GetConnectionString()
         {
-            return ConfigurationManager
-                .ConnectionStrings["CollegeEventDB"]
-                .ConnectionString;
+            var settings = ConfigurationManager.ConnectionStrings["CollegeEventDB"];
+
+            if (settings == null || string.IsNullOrWhiteSpace(settings.ConnectionString))
+            {
+                throw new ConfigurationErrorsException(
+                    "Connection string 'CollegeEventDB' is missing or empty in App.config.\n" +
+                    "Please add a valid connection string with name 'CollegeEventDB'.");
+            }
+
+            return settings.ConnectionString;
         }
 
         /// <summary>
@@ -164,17 +171,10 @@ namespace CollegeEventManagementSystem.Data
         /// </summary>
         public static bool CanConnect()
         {
-            try
+            using (SqlConnection connection = GetConnection())
             {
-                using (SqlConnection connection = GetConnection())
-                {
-                    connection.Open();
-                    return true;
-                }
-            }
-            catch (Exception)
-            {
-                return false;
+                connection.Open();
+                return true;
             }
         }
     }

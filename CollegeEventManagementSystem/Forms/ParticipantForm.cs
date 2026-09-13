@@ -80,9 +80,9 @@ namespace CollegeEventManagementSystem.Forms
                 cmbFilterEvent.DataSource = filterEvents;
                 cmbFilterEvent.SelectedIndex = 0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to load the event list.", "Database Error",
+                MessageBox.Show("Unable to load the event list.\n\nError: " + ex.Message, "Database Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -96,16 +96,17 @@ namespace CollegeEventManagementSystem.Forms
         {
             try
             {
-                string sql = "SELECT StudentID, StudentName FROM Students ORDER BY StudentName";
+                // Select FullName from DB but alias to StudentName to keep UI code unchanged
+                string sql = "SELECT StudentID, FullName AS StudentName FROM Students ORDER BY FullName";
 
                 cmbStudent.DisplayMember = "StudentName";
                 cmbStudent.ValueMember = "StudentID";
                 cmbStudent.DataSource = DatabaseHelper.GetDataTable(sql);
                 cmbStudent.SelectedIndex = -1;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to load the student list.", "Database Error",
+                MessageBox.Show("Unable to load the student list.\n\nError: " + ex.Message, "Database Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -120,7 +121,7 @@ namespace CollegeEventManagementSystem.Forms
             try
             {
                 string sql =
-                    "SELECT p.ParticipantID, s.StudentName, e.EventName, p.RegistrationDate, " +
+                    "SELECT p.ParticipantID, s.FullName AS StudentName, e.EventName, p.RegistrationDate, " +
                     "p.EventID, p.StudentID " +
                     "FROM Participants p " +
                     "INNER JOIN Students s ON p.StudentID = s.StudentID " +
@@ -130,12 +131,12 @@ namespace CollegeEventManagementSystem.Forms
 
                 if (eventId > 0)
                 {
-                    sql = sql + "WHERE p.EventID = @EventID ORDER BY s.StudentName";
+                    sql = sql + "WHERE p.EventID = @EventID ORDER BY s.FullName";
                     table = DatabaseHelper.GetDataTable(sql, DatabaseHelper.Param("@EventID", eventId));
                 }
                 else
                 {
-                    sql = sql + "ORDER BY e.EventName, s.StudentName";
+                    sql = sql + "ORDER BY e.EventName, s.FullName";
                     table = DatabaseHelper.GetDataTable(sql);
                 }
 
@@ -154,9 +155,9 @@ namespace CollegeEventManagementSystem.Forms
                 dgvParticipants.Columns["StudentID"].Visible = false;
                 dgvParticipants.ClearSelection();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to load the participant records. Please check the database connection.",
+                MessageBox.Show("Unable to load the participant records. Please check the database connection.\n\nError: " + ex.Message,
                     "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

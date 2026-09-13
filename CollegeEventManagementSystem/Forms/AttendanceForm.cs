@@ -61,9 +61,9 @@ namespace CollegeEventManagementSystem.Forms
                 cmbEvent.DataSource = DatabaseHelper.GetDataTable(sql);
                 cmbEvent.SelectedIndex = -1;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to load the event list.", "Database Error",
+                MessageBox.Show("Unable to load the event list.\n\nError: " + ex.Message, "Database Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -105,11 +105,12 @@ namespace CollegeEventManagementSystem.Forms
 
             try
             {
-                string sql = "SELECT p.ParticipantID, s.StudentName " +
+                // map FullName to StudentName for UI compatibility
+                string sql = "SELECT p.ParticipantID, s.FullName AS StudentName " +
                              "FROM Participants p " +
                              "INNER JOIN Students s ON p.StudentID = s.StudentID " +
                              "WHERE p.EventID = @EventID " +
-                             "ORDER BY s.StudentName";
+                             "ORDER BY s.FullName";
 
                 DataTable participants = DatabaseHelper.GetDataTable(sql,
                     DatabaseHelper.Param("@EventID", eventId));
@@ -127,9 +128,9 @@ namespace CollegeEventManagementSystem.Forms
                         "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to load the participants of this event.", "Database Error",
+                MessageBox.Show("Unable to load the participants of this event.\n\nError: " + ex.Message, "Database Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -140,13 +141,13 @@ namespace CollegeEventManagementSystem.Forms
             try
             {
                 string sql =
-                    "SELECT a.AttendanceID, s.StudentName, e.EventName, a.AttendanceDate, a.Status, a.ParticipantID " +
+                    "SELECT a.AttendanceID, s.FullName AS StudentName, e.EventName, a.AttendanceDate, a.Status, a.ParticipantID " +
                     "FROM Attendance a " +
                     "INNER JOIN Participants p ON a.ParticipantID = p.ParticipantID " +
                     "INNER JOIN Students s ON p.StudentID = s.StudentID " +
                     "INNER JOIN Events e ON p.EventID = e.EventID " +
                     "WHERE p.EventID = @EventID " +
-                    "ORDER BY s.StudentName";
+                    "ORDER BY s.FullName";
 
                 dgvAttendance.DataSource = DatabaseHelper.GetDataTable(sql,
                     DatabaseHelper.Param("@EventID", eventId));
@@ -165,9 +166,9 @@ namespace CollegeEventManagementSystem.Forms
                 dgvAttendance.Columns["ParticipantID"].Visible = false;
                 dgvAttendance.ClearSelection();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to load the attendance records.", "Database Error",
+                MessageBox.Show("Unable to load the attendance records.\n\nError: " + ex.Message, "Database Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

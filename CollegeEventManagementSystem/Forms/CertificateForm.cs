@@ -47,21 +47,21 @@ namespace CollegeEventManagementSystem.Forms
             try
             {
                 string sql =
-                    "SELECT p.ParticipantID, s.StudentName + ' - ' + e.EventName AS ParticipantName " +
+                    "SELECT p.ParticipantID, s.FullName + ' - ' + e.EventName AS ParticipantName " +
                     "FROM Participants p " +
                     "INNER JOIN Students s ON p.StudentID = s.StudentID " +
                     "INNER JOIN Events e ON p.EventID = e.EventID " +
-                    "ORDER BY s.StudentName";
+                    "ORDER BY s.FullName";
 
                 cmbParticipant.DisplayMember = "ParticipantName";
                 cmbParticipant.ValueMember = "ParticipantID";
                 cmbParticipant.DataSource = DatabaseHelper.GetDataTable(sql);
                 cmbParticipant.SelectedIndex = -1;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to load the participant list.", "Database Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Unable to load the participant list.\n\nError: " + ex.Message,
+                    "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -71,7 +71,7 @@ namespace CollegeEventManagementSystem.Forms
             try
             {
                 string sql =
-                    "SELECT c.CertificateID, s.StudentName, e.EventName, c.CertificateNo, " +
+                    "SELECT c.CertificateID, s.FullName AS StudentName, e.EventName, c.CertificateNo, " +
                     "c.CertificateType, c.IssueDate, c.ParticipantID " +
                     "FROM Certificates c " +
                     "INNER JOIN Participants p ON c.ParticipantID = p.ParticipantID " +
@@ -97,9 +97,9 @@ namespace CollegeEventManagementSystem.Forms
                 dgvCertificates.Columns["ParticipantID"].Visible = false;
                 dgvCertificates.ClearSelection();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to load the certificate records. Please check the database connection.",
+                MessageBox.Show("Unable to load the certificate records. Please check the database connection.\n\nError: " + ex.Message,
                     "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

@@ -39,14 +39,17 @@ namespace CollegeEventManagementSystem.Forms
         {
             try
             {
-                string sql = "SELECT StudentID, StudentName, Email, Phone, Program, Semester " +
-                             "FROM Students ORDER BY StudentName";
+                string sql = "SELECT StudentID, FullName AS StudentName, Email, Phone, Program, Semester " +
+                             "FROM Students ORDER BY FullName";
 
                 ShowStudents(DatabaseHelper.GetDataTable(sql));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to load the student records. Please check the database connection.",
+                // Show the original error message to help diagnose connection/config issues.
+                MessageBox.Show(
+                    "Unable to load the student records. Please check the database connection.\n\n" +
+                    "Error: " + ex.Message,
                     "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -59,10 +62,11 @@ namespace CollegeEventManagementSystem.Forms
         {
             try
             {
-                string sql = "SELECT StudentID, StudentName, Email, Phone, Program, Semester " +
+                // Select FullName but expose it as StudentName to keep UI field names consistent
+                string sql = "SELECT StudentID, FullName AS StudentName, Email, Phone, Program, Semester " +
                              "FROM Students " +
-                             "WHERE StudentName LIKE @Search OR Email LIKE @Search " +
-                             "ORDER BY StudentName";
+                             "WHERE FullName LIKE @Search OR Email LIKE @Search " +
+                             "ORDER BY FullName";
 
                 DataTable table = DatabaseHelper.GetDataTable(sql,
                     DatabaseHelper.Param("@Search", "%" + searchText + "%"));
@@ -171,7 +175,8 @@ namespace CollegeEventManagementSystem.Forms
 
             try
             {
-                string sql = "INSERT INTO Students (StudentName, Email, Phone, Program, Semester) " +
+                // Students table uses FullName column in the database
+                string sql = "INSERT INTO Students (FullName, Email, Phone, Program, Semester) " +
                              "VALUES (@StudentName, @Email, @Phone, @Program, @Semester)";
 
                 DatabaseHelper.ExecuteNonQuery(sql,
@@ -215,7 +220,7 @@ namespace CollegeEventManagementSystem.Forms
 
             try
             {
-                string sql = "UPDATE Students SET StudentName = @StudentName, Email = @Email, " +
+                string sql = "UPDATE Students SET FullName = @StudentName, Email = @Email, " +
                              "Phone = @Phone, Program = @Program, Semester = @Semester " +
                              "WHERE StudentID = @StudentID";
 

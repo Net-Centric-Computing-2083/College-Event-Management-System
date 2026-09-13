@@ -66,7 +66,7 @@ GO
 CREATE TABLE Students
 (
     StudentID   INT IDENTITY(1,1) NOT NULL,
-    StudentName VARCHAR(100)      NOT NULL,
+    FullName    VARCHAR(100)      NOT NULL,
     Email       VARCHAR(150)      NULL,
     Phone       VARCHAR(20)       NULL,
     Program     VARCHAR(100)      NULL,
@@ -181,7 +181,7 @@ INSERT INTO Venues (VenueName, Location, Capacity) VALUES
 ('College Ground',  'Main Campus',          1000);   -- VenueID 4
 GO
 
-INSERT INTO Students (StudentName, Email, Phone, Program, Semester) VALUES
+INSERT INTO Students (FullName, Email, Phone, Program, Semester) VALUES
 ('Aarav Sharma',     'aarav.sharma@example.com',     '9801000001', 'BSc CSIT', 5),  -- StudentID 1
 ('Nisha Karki',      'nisha.karki@example.com',      '9801000002', 'BSc CSIT', 5),  -- StudentID 2
 ('Rohan Thapa',      'rohan.thapa@example.com',      '9801000003', 'BCA',      3),  -- StudentID 3

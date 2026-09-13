@@ -48,10 +48,11 @@ namespace CollegeEventManagementSystem.Forms
                 dgvCategories.Columns["Description"].FillWeight = 200;
                 dgvCategories.ClearSelection();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 MessageBox.Show(
-                    "Unable to load the category records. Please check the database connection.",
+                    "Unable to load the category records. Please check the database connection.\n\n" +
+                    "Error: " + ex.Message,
                     "Database Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
