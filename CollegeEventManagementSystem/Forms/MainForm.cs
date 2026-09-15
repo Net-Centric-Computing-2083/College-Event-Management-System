@@ -36,7 +36,15 @@ namespace CollegeEventManagementSystem.Forms
             pnlHeader.BackColor = Theme.PrimaryDark;
             pnlSidebar.BackColor = Theme.Primary;
             pnlContent.BackColor = Theme.Background;
+            pnlFooter.BackColor = Color.White;
             lblLogo.ForeColor = Theme.Primary;
+            lblFooter.ForeColor = Theme.TextMuted;
+            lblFooterDate.ForeColor = Theme.TextMuted;
+            lblFooterDate.Text = DateTime.Now.ToString("dddd, dd MMMM yyyy");
+
+            // The white strip that marks which screen is open.
+            pnlNavIndicator.BackColor = Color.White;
+            pnlNavIndicator.BringToFront();
         }
 
         /// <summary>
@@ -107,11 +115,15 @@ namespace CollegeEventManagementSystem.Forms
             {
                 if (control is Button)
                 {
-                    control.BackColor = Theme.Primary;
+                    Theme.StyleNavButtonInactive((Button)control);
                 }
             }
 
-            activeButton.BackColor = Theme.PrimaryDark;
+            Theme.StyleNavButtonActive(activeButton);
+
+            // Move the white indicator strip next to the button that is open.
+            pnlNavIndicator.Bounds = new Rectangle(0, activeButton.Top, 5, activeButton.Height);
+            pnlNavIndicator.BringToFront();
         }
 
         private void btnDashboard_Click(object sender, EventArgs e)

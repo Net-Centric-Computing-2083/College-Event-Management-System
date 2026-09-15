@@ -129,6 +129,30 @@ namespace CollegeEventManagementSystem.Forms
         /// Checks whether the certificate number is already used.
         /// The Certificates table also has a UNIQUE constraint on CertificateNo.
         /// </summary>
+        /// <summary>
+        /// Checks whether the same participant already has a certificate of the same
+        /// type, so the same certificate is never recorded twice for one event.
+        /// </summary>
+        private bool IsDuplicateCertificateType(int participantId, string certificateType, int ignoreCertificateId)
+        {
+            if (certificateType.Length == 0)
+            {
+                return false;
+            }
+
+            string sql = "SELECT COUNT(*) FROM Certificates " +
+                         "WHERE ParticipantID = @ParticipantID " +
+                         "AND CertificateType = @CertificateType " +
+                         "AND CertificateID <> @CertificateID";
+
+            int count = DatabaseHelper.GetCount(sql,
+                DatabaseHelper.Param("@ParticipantID", participantId),
+                DatabaseHelper.Param("@CertificateType", certificateType),
+                DatabaseHelper.Param("@CertificateID", ignoreCertificateId));
+
+            return count > 0;
+        }
+
         private bool IsDuplicateCertificateNo(string certificateNo, int ignoreCertificateId)
         {
             string sql = "SELECT COUNT(*) FROM Certificates " +
@@ -141,9 +165,53 @@ namespace CollegeEventManagementSystem.Forms
             return count > 0;
         }
 
+        /// <summary>Reads the date of the event this participation belongs to.</summary>
+        private DateTime? GetEventDateOfParticipant(int participantId)
+        {
+            object value = DatabaseHelper.ExecuteScalar(
+                "SELECT e.EventDate FROM Participants p " +
+                "INNER JOIN Events e ON p.EventID = e.EventID " +
+                "WHERE p.ParticipantID = @ParticipantID",
+                DatabaseHelper.Param("@ParticipantID", participantId));
+
+            if (value == null || value == DBNull.Value)
+            {
+                return null;
+            }
+
+            return Convert.ToDateTime(value);
+        }
+
+        /// <summary>
+        /// Keeps the certificate data consistent with the event: a certificate that is
+        /// issued before the event date has to be confirmed by the user.
+        /// </summary>
+        private bool IsIssueDateAccepted(int participantId)
+        {
+            DateTime? eventDate = GetEventDateOfParticipant(participantId);
+
+            if (eventDate == null || dtpIssueDate.Value.Date >= eventDate.Value.Date)
+            {
+                return true;
+            }
+
+            DialogResult answer = MessageBox.Show(
+                "This event takes place on " + eventDate.Value.ToString("dd MMM yyyy") +
+                ", which is after the selected issue date.\n\n" +
+                "Do you still want to save this certificate record?",
+                "Check the Dates", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            return answer == DialogResult.Yes;
+        }
+
         private void btnAdd_Click(object sender, EventArgs e)
         {
             if (!IsInputValid())
+            {
+                return;
+            }
+
+            if (!IsIssueDateAccepted(Convert.ToInt32(cmbParticipant.SelectedValue)))
             {
                 return;
             }
@@ -154,6 +222,16 @@ namespace CollegeEventManagementSystem.Forms
                 {
                     MessageBox.Show("This certificate number is already used. Please enter a different number.",
                         "Duplicate Certificate Number", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtCertificateNo.Focus();
+                    return;
+                }
+
+                // The same participant should not receive two certificates of the same type.
+                if (IsDuplicateCertificateType(Convert.ToInt32(cmbParticipant.SelectedValue),
+                        cmbCertificateType.Text.Trim(), 0))
+                {
+                    MessageBox.Show("This participant already has a certificate of the same type for this event.",
+                        "Duplicate Certificate", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
@@ -206,12 +284,27 @@ namespace CollegeEventManagementSystem.Forms
                 return;
             }
 
+            if (!IsIssueDateAccepted(Convert.ToInt32(cmbParticipant.SelectedValue)))
+            {
+                return;
+            }
+
             try
             {
                 if (IsDuplicateCertificateNo(txtCertificateNo.Text.Trim(), selectedCertificateId))
                 {
                     MessageBox.Show("This certificate number is already used. Please enter a different number.",
                         "Duplicate Certificate Number", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtCertificateNo.Focus();
+                    return;
+                }
+
+                // The same participant should not receive two certificates of the same type.
+                if (IsDuplicateCertificateType(Convert.ToInt32(cmbParticipant.SelectedValue),
+                        cmbCertificateType.Text.Trim(), selectedCertificateId))
+                {
+                    MessageBox.Show("This participant already has a certificate of the same type for this event.",
+                        "Duplicate Certificate", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 

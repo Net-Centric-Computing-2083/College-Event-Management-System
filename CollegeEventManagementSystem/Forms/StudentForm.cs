@@ -27,6 +27,7 @@ namespace CollegeEventManagementSystem.Forms
             Theme.StylePrimaryButton(btnSearch);
             Theme.StyleSecondaryButton(btnShowAll);
             Theme.StyleGrid(dgvStudents);
+            Theme.StyleGrid(dgvStudentEvents);
         }
 
         private void StudentForm_Load(object sender, EventArgs e)
@@ -106,6 +107,66 @@ namespace CollegeEventManagementSystem.Forms
             dgvStudents.ClearSelection();
         }
 
+        /// <summary>
+        /// Shows the list of events the selected student has participated in.
+        /// Participants is joined with Events, and the attendance status of that
+        /// participation is read with a small sub query.
+        /// </summary>
+        private void LoadStudentEvents(int studentId, string studentName)
+        {
+            try
+            {
+                string sql =
+                    "SELECT e.EventName, e.EventDate, p.RegistrationDate, " +
+                    "ISNULL((SELECT TOP 1 a.Status FROM Attendance a " +
+                    "WHERE a.ParticipantID = p.ParticipantID " +
+                    "ORDER BY a.AttendanceDate DESC), 'Not recorded') AS Status " +
+                    "FROM Participants p " +
+                    "INNER JOIN Events e ON p.EventID = e.EventID " +
+                    "WHERE p.StudentID = @StudentID " +
+                    "ORDER BY e.EventDate DESC";
+
+                DataTable table = DatabaseHelper.GetDataTable(sql,
+                    DatabaseHelper.Param("@StudentID", studentId));
+
+                dgvStudentEvents.DataSource = table;
+
+                dgvStudentEvents.Columns["EventName"].HeaderText = "Event Name";
+                dgvStudentEvents.Columns["EventDate"].HeaderText = "Event Date";
+                dgvStudentEvents.Columns["RegistrationDate"].HeaderText = "Registered On";
+                dgvStudentEvents.Columns["Status"].HeaderText = "Attendance";
+                dgvStudentEvents.Columns["EventDate"].DefaultCellStyle.Format = "dd MMM yyyy";
+                dgvStudentEvents.Columns["RegistrationDate"].DefaultCellStyle.Format = "dd MMM yyyy";
+                dgvStudentEvents.Columns["EventName"].FillWeight = 150;
+                dgvStudentEvents.Columns["EventDate"].FillWeight = 95;
+                dgvStudentEvents.Columns["RegistrationDate"].FillWeight = 95;
+                dgvStudentEvents.Columns["Status"].FillWeight = 90;
+                dgvStudentEvents.ClearSelection();
+
+                if (table.Rows.Count == 0)
+                {
+                    lblStudentEvents.Text = "Events Participated - " + studentName + " (none)";
+                }
+                else
+                {
+                    lblStudentEvents.Text = "Events Participated - " + studentName +
+                        " (" + table.Rows.Count.ToString() + ")";
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Unable to load the events of this student. Please try again.",
+                    "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>Empties the participated events list when no student is selected.</summary>
+        private void ClearStudentEvents()
+        {
+            dgvStudentEvents.DataSource = null;
+            lblStudentEvents.Text = "Events Participated (select a student)";
+        }
+
         /// <summary>Validates the student details before they are saved.</summary>
         private bool IsInputValid()
         {
@@ -153,6 +214,54 @@ namespace CollegeEventManagementSystem.Forms
             return true;
         }
 
+        /// <summary>
+        /// Prevents the same student from being registered twice. A student is treated
+        /// as a duplicate when the email address is already used by somebody else, or
+        /// when the same full name is already registered in the same program.
+        /// </summary>
+        private bool IsDuplicateStudent(int ignoreStudentId)
+        {
+            string email = txtEmail.Text.Trim();
+
+            if (email.Length > 0)
+            {
+                string emailSql = "SELECT COUNT(*) FROM Students " +
+                                  "WHERE Email = @Email AND StudentID <> @StudentID";
+
+                int emailCount = DatabaseHelper.GetCount(emailSql,
+                    DatabaseHelper.Param("@Email", email),
+                    DatabaseHelper.Param("@StudentID", ignoreStudentId));
+
+                if (emailCount > 0)
+                {
+                    MessageBox.Show("This email address is already registered for another student.",
+                        "Duplicate Student", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtEmail.Focus();
+                    return true;
+                }
+            }
+
+            string nameSql = "SELECT COUNT(*) FROM Students " +
+                             "WHERE FullName = @FullName " +
+                             "AND ISNULL(Program, '') = ISNULL(@Program, '') " +
+                             "AND StudentID <> @StudentID";
+
+            int nameCount = DatabaseHelper.GetCount(nameSql,
+                DatabaseHelper.Param("@FullName", txtStudentName.Text.Trim()),
+                DatabaseHelper.Param("@Program", txtProgram.Text.Trim()),
+                DatabaseHelper.Param("@StudentID", ignoreStudentId));
+
+            if (nameCount > 0)
+            {
+                MessageBox.Show("This student is already registered in the same program.",
+                    "Duplicate Student", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtStudentName.Focus();
+                return true;
+            }
+
+            return false;
+        }
+
         /// <summary>Returns the semester as a number, or null when the box is empty.</summary>
         private object GetSemesterValue()
         {
@@ -169,6 +278,11 @@ namespace CollegeEventManagementSystem.Forms
         private void btnAdd_Click(object sender, EventArgs e)
         {
             if (!IsInputValid())
+            {
+                return;
+            }
+
+            if (IsDuplicateStudent(0))
             {
                 return;
             }
@@ -214,6 +328,11 @@ namespace CollegeEventManagementSystem.Forms
             }
 
             if (!IsInputValid())
+            {
+                return;
+            }
+
+            if (IsDuplicateStudent(selectedStudentId))
             {
                 return;
             }
@@ -317,6 +436,16 @@ namespace CollegeEventManagementSystem.Forms
             SearchStudents(searchText);
         }
 
+        /// <summary>Pressing Enter inside the search box works like the Search button.</summary>
+        private void txtSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+                btnSearch_Click(sender, e);
+            }
+        }
+
         private void btnShowAll_Click(object sender, EventArgs e)
         {
             txtSearch.Clear();
@@ -337,6 +466,7 @@ namespace CollegeEventManagementSystem.Forms
             txtProgram.Clear();
             txtSemester.Clear();
             dgvStudents.ClearSelection();
+            ClearStudentEvents();
             txtStudentName.Focus();
         }
 
@@ -355,6 +485,8 @@ namespace CollegeEventManagementSystem.Forms
             txtPhone.Text = Convert.ToString(row.Cells["Phone"].Value);
             txtProgram.Text = Convert.ToString(row.Cells["Program"].Value);
             txtSemester.Text = Convert.ToString(row.Cells["Semester"].Value);
+
+            LoadStudentEvents(selectedStudentId, txtStudentName.Text);
         }
     }
 }

@@ -202,6 +202,72 @@ namespace CollegeEventManagementSystem.Forms
             return true;
         }
 
+        /// <summary>
+        /// Checks whether the attendance of this participant is already recorded for
+        /// the selected date, so the same attendance can never be saved twice.
+        /// </summary>
+        private bool IsDuplicateAttendance(int participantId, DateTime attendanceDate, int ignoreAttendanceId)
+        {
+            string sql = "SELECT COUNT(*) FROM Attendance " +
+                         "WHERE ParticipantID = @ParticipantID " +
+                         "AND AttendanceDate = @AttendanceDate " +
+                         "AND AttendanceID <> @AttendanceID";
+
+            int count = DatabaseHelper.GetCount(sql,
+                DatabaseHelper.Param("@ParticipantID", participantId),
+                DatabaseHelper.Param("@AttendanceDate", attendanceDate),
+                DatabaseHelper.Param("@AttendanceID", ignoreAttendanceId));
+
+            return count > 0;
+        }
+
+        /// <summary>Reads the date of one event from the database.</summary>
+        private DateTime? GetEventDate(int eventId)
+        {
+            object value = DatabaseHelper.ExecuteScalar(
+                "SELECT EventDate FROM Events WHERE EventID = @EventID",
+                DatabaseHelper.Param("@EventID", eventId));
+
+            if (value == null || value == DBNull.Value)
+            {
+                return null;
+            }
+
+            return Convert.ToDateTime(value);
+        }
+
+        /// <summary>
+        /// Keeps the attendance date consistent with the event: a future date is not
+        /// allowed, and a date before the event date has to be confirmed by the user.
+        /// </summary>
+        private bool IsAttendanceDateAccepted()
+        {
+            DateTime attendanceDate = dtpAttendanceDate.Value.Date;
+
+            if (attendanceDate > DateTime.Today)
+            {
+                MessageBox.Show("The attendance date cannot be in the future.", "Validation",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                dtpAttendanceDate.Focus();
+                return false;
+            }
+
+            DateTime? eventDate = GetEventDate(GetSelectedEventId());
+
+            if (eventDate != null && attendanceDate < eventDate.Value.Date)
+            {
+                DialogResult answer = MessageBox.Show(
+                    "This event takes place on " + eventDate.Value.ToString("dd MMM yyyy") +
+                    ", which is after the selected attendance date.\n\n" +
+                    "Do you still want to save this attendance record?",
+                    "Check the Dates", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                return answer == DialogResult.Yes;
+            }
+
+            return true;
+        }
+
         private void btnSave_Click(object sender, EventArgs e)
         {
             if (!IsInputValid())
@@ -209,8 +275,21 @@ namespace CollegeEventManagementSystem.Forms
                 return;
             }
 
+            if (!IsAttendanceDateAccepted())
+            {
+                return;
+            }
+
             try
             {
+                if (IsDuplicateAttendance(Convert.ToInt32(cmbParticipant.SelectedValue),
+                        dtpAttendanceDate.Value.Date, 0))
+                {
+                    MessageBox.Show("Attendance of this participant is already recorded for the selected date.",
+                        "Duplicate Attendance", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 string sql = "INSERT INTO Attendance (ParticipantID, AttendanceDate, Status) " +
                              "VALUES (@ParticipantID, @AttendanceDate, @Status)";
 
@@ -259,8 +338,21 @@ namespace CollegeEventManagementSystem.Forms
                 return;
             }
 
+            if (!IsAttendanceDateAccepted())
+            {
+                return;
+            }
+
             try
             {
+                if (IsDuplicateAttendance(Convert.ToInt32(cmbParticipant.SelectedValue),
+                        dtpAttendanceDate.Value.Date, selectedAttendanceId))
+                {
+                    MessageBox.Show("Attendance of this participant is already recorded for the selected date.",
+                        "Duplicate Attendance", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 string sql = "UPDATE Attendance SET ParticipantID = @ParticipantID, " +
                              "AttendanceDate = @AttendanceDate, Status = @Status " +
                              "WHERE AttendanceID = @AttendanceID";

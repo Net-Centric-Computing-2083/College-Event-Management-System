@@ -213,6 +213,31 @@ namespace CollegeEventManagementSystem.Forms
         }
 
         // ============================================================
+        // DUPLICATE CHECK
+        // ============================================================
+
+        /// <summary>
+        /// Checks whether another event with the same name is already saved on the
+        /// same date, so the same event can never be created twice.
+        /// </summary>
+        private bool IsDuplicateEvent(string eventName, DateTime eventDate, int ignoreEventId)
+        {
+            string sql =
+                "SELECT COUNT(*) FROM Events " +
+                "WHERE EventName = @EventName " +
+                "AND EventDate = @EventDate " +
+                "AND EventID <> @EventID";
+
+            int count = DatabaseHelper.GetCount(
+                sql,
+                DatabaseHelper.Param("@EventName", eventName),
+                DatabaseHelper.Param("@EventDate", eventDate),
+                DatabaseHelper.Param("@EventID", ignoreEventId));
+
+            return count > 0;
+        }
+
+        // ============================================================
         // ADD EVENT
         // ============================================================
 
@@ -225,6 +250,18 @@ namespace CollegeEventManagementSystem.Forms
 
             try
             {
+                if (IsDuplicateEvent(txtEventName.Text.Trim(), dtpEventDate.Value.Date, 0))
+                {
+                    MessageBox.Show(
+                        "An event with this name is already saved on the selected date.",
+                        "Duplicate Event",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+
+                    txtEventName.Focus();
+                    return;
+                }
+
                 string sql =
                     "INSERT INTO Events " +
                     "(EventName, CategoryID, VenueID, EventDate, Description) " +
@@ -305,6 +342,18 @@ namespace CollegeEventManagementSystem.Forms
 
             try
             {
+                if (IsDuplicateEvent(txtEventName.Text.Trim(), dtpEventDate.Value.Date, selectedEventId))
+                {
+                    MessageBox.Show(
+                        "An event with this name is already saved on the selected date.",
+                        "Duplicate Event",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+
+                    txtEventName.Focus();
+                    return;
+                }
+
                 string sql =
                     "UPDATE Events SET " +
                     "EventName = @EventName, " +

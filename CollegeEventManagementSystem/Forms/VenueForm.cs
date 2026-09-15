@@ -87,6 +87,22 @@ namespace CollegeEventManagementSystem.Forms
             return true;
         }
 
+        /// <summary>
+        /// Checks whether another venue with the same name already exists, so the same
+        /// venue can never be saved twice.
+        /// </summary>
+        private bool IsDuplicateVenue(string venueName, int ignoreVenueId)
+        {
+            string sql = "SELECT COUNT(*) FROM Venues " +
+                         "WHERE VenueName = @VenueName AND VenueID <> @VenueID";
+
+            int count = DatabaseHelper.GetCount(sql,
+                DatabaseHelper.Param("@VenueName", venueName),
+                DatabaseHelper.Param("@VenueID", ignoreVenueId));
+
+            return count > 0;
+        }
+
         private void btnAdd_Click(object sender, EventArgs e)
         {
             if (!IsInputValid())
@@ -96,6 +112,14 @@ namespace CollegeEventManagementSystem.Forms
 
             try
             {
+                if (IsDuplicateVenue(txtVenueName.Text.Trim(), 0))
+                {
+                    MessageBox.Show("A venue with this name already exists. Please use a different name.",
+                        "Duplicate Venue", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtVenueName.Focus();
+                    return;
+                }
+
                 string sql = "INSERT INTO Venues (VenueName, Location, Capacity) " +
                              "VALUES (@VenueName, @Location, @Capacity)";
 
@@ -138,6 +162,14 @@ namespace CollegeEventManagementSystem.Forms
 
             try
             {
+                if (IsDuplicateVenue(txtVenueName.Text.Trim(), selectedVenueId))
+                {
+                    MessageBox.Show("A venue with this name already exists. Please use a different name.",
+                        "Duplicate Venue", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtVenueName.Focus();
+                    return;
+                }
+
                 string sql = "UPDATE Venues SET VenueName = @VenueName, Location = @Location, " +
                              "Capacity = @Capacity WHERE VenueID = @VenueID";
 

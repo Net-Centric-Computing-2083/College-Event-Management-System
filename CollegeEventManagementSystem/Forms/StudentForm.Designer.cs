@@ -41,11 +41,16 @@ namespace CollegeEventManagementSystem.Forms
             this.lblSearch = new System.Windows.Forms.Label();
             this.pnlGrid = new System.Windows.Forms.Panel();
             this.dgvStudents = new System.Windows.Forms.DataGridView();
+            this.pnlStudentEvents = new System.Windows.Forms.Panel();
+            this.lblStudentEvents = new System.Windows.Forms.Label();
+            this.dgvStudentEvents = new System.Windows.Forms.DataGridView();
             this.pnlTitle.SuspendLayout();
             this.grpStudentDetails.SuspendLayout();
             this.grpSearch.SuspendLayout();
             this.pnlGrid.SuspendLayout();
+            this.pnlStudentEvents.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvStudents)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvStudentEvents)).BeginInit();
             this.SuspendLayout();
             // 
             // pnlTitle
@@ -272,6 +277,7 @@ namespace CollegeEventManagementSystem.Forms
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(280, 25);
             this.txtSearch.TabIndex = 1;
+            this.txtSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSearch_KeyDown);
             // 
             // btnSearch
             // 
@@ -296,6 +302,7 @@ namespace CollegeEventManagementSystem.Forms
             // pnlGrid
             // 
             this.pnlGrid.Controls.Add(this.dgvStudents);
+            this.pnlGrid.Controls.Add(this.pnlStudentEvents);
             this.pnlGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlGrid.Location = new System.Drawing.Point(0, 352);
             this.pnlGrid.Name = "pnlGrid";
@@ -311,6 +318,37 @@ namespace CollegeEventManagementSystem.Forms
             this.dgvStudents.Size = new System.Drawing.Size(992, 256);
             this.dgvStudents.TabIndex = 0;
             this.dgvStudents.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvStudents_CellClick);
+            // 
+            // pnlStudentEvents
+            // 
+            this.pnlStudentEvents.Controls.Add(this.dgvStudentEvents);
+            this.pnlStudentEvents.Controls.Add(this.lblStudentEvents);
+            this.pnlStudentEvents.Dock = System.Windows.Forms.DockStyle.Right;
+            this.pnlStudentEvents.Location = new System.Drawing.Point(592, 16);
+            this.pnlStudentEvents.Name = "pnlStudentEvents";
+            this.pnlStudentEvents.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
+            this.pnlStudentEvents.Size = new System.Drawing.Size(416, 256);
+            this.pnlStudentEvents.TabIndex = 1;
+            // 
+            // lblStudentEvents
+            // 
+            this.lblStudentEvents.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblStudentEvents.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblStudentEvents.ForeColor = System.Drawing.Color.FromArgb(74, 20, 140);
+            this.lblStudentEvents.Location = new System.Drawing.Point(12, 0);
+            this.lblStudentEvents.Name = "lblStudentEvents";
+            this.lblStudentEvents.Size = new System.Drawing.Size(404, 28);
+            this.lblStudentEvents.TabIndex = 0;
+            this.lblStudentEvents.Text = "Events Participated (select a student)";
+            this.lblStudentEvents.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // dgvStudentEvents
+            // 
+            this.dgvStudentEvents.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvStudentEvents.Location = new System.Drawing.Point(12, 28);
+            this.dgvStudentEvents.Name = "dgvStudentEvents";
+            this.dgvStudentEvents.Size = new System.Drawing.Size(404, 228);
+            this.dgvStudentEvents.TabIndex = 1;
             // 
             // StudentForm
             // 
@@ -332,7 +370,9 @@ namespace CollegeEventManagementSystem.Forms
             this.grpSearch.ResumeLayout(false);
             this.grpSearch.PerformLayout();
             this.pnlGrid.ResumeLayout(false);
+            this.pnlStudentEvents.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvStudents)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvStudentEvents)).EndInit();
             this.ResumeLayout(false);
         }
 
@@ -362,5 +402,8 @@ namespace CollegeEventManagementSystem.Forms
         private System.Windows.Forms.Button btnShowAll;
         private System.Windows.Forms.Panel pnlGrid;
         private System.Windows.Forms.DataGridView dgvStudents;
+        private System.Windows.Forms.Panel pnlStudentEvents;
+        private System.Windows.Forms.Label lblStudentEvents;
+        private System.Windows.Forms.DataGridView dgvStudentEvents;
     }
 }

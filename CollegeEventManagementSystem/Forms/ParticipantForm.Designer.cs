@@ -33,6 +33,9 @@ namespace CollegeEventManagementSystem.Forms
             this.grpFilter = new System.Windows.Forms.GroupBox();
             this.btnRefresh = new System.Windows.Forms.Button();
             this.cmbFilterEvent = new System.Windows.Forms.ComboBox();
+            this.lblFilterStudent = new System.Windows.Forms.Label();
+            this.cmbFilterStudent = new System.Windows.Forms.ComboBox();
+            this.btnClearFilter = new System.Windows.Forms.Button();
             this.lblFilter = new System.Windows.Forms.Label();
             this.pnlGrid = new System.Windows.Forms.Panel();
             this.dgvParticipants = new System.Windows.Forms.DataGridView();
@@ -191,7 +194,10 @@ namespace CollegeEventManagementSystem.Forms
             // 
             // grpFilter
             // 
+            this.grpFilter.Controls.Add(this.btnClearFilter);
             this.grpFilter.Controls.Add(this.btnRefresh);
+            this.grpFilter.Controls.Add(this.cmbFilterStudent);
+            this.grpFilter.Controls.Add(this.lblFilterStudent);
             this.grpFilter.Controls.Add(this.cmbFilterEvent);
             this.grpFilter.Controls.Add(this.lblFilter);
             this.grpFilter.Dock = System.Windows.Forms.DockStyle.Top;
@@ -203,7 +209,7 @@ namespace CollegeEventManagementSystem.Forms
             this.grpFilter.Size = new System.Drawing.Size(1024, 80);
             this.grpFilter.TabIndex = 2;
             this.grpFilter.TabStop = false;
-            this.grpFilter.Text = "Participant List";
+            this.grpFilter.Text = "Filter Participants";
             // 
             // lblFilter
             // 
@@ -212,27 +218,59 @@ namespace CollegeEventManagementSystem.Forms
             this.lblFilter.ForeColor = System.Drawing.Color.FromArgb(46, 42, 53);
             this.lblFilter.Location = new System.Drawing.Point(20, 36);
             this.lblFilter.Name = "lblFilter";
-            this.lblFilter.Size = new System.Drawing.Size(120, 17);
+            this.lblFilter.Size = new System.Drawing.Size(44, 17);
             this.lblFilter.TabIndex = 0;
-            this.lblFilter.Text = "Show event";
+            this.lblFilter.Text = "Event";
             // 
             // cmbFilterEvent
             // 
             this.cmbFilterEvent.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbFilterEvent.Font = new System.Drawing.Font("Segoe UI", 9.75F);
             this.cmbFilterEvent.FormattingEnabled = true;
-            this.cmbFilterEvent.Location = new System.Drawing.Point(150, 33);
+            this.cmbFilterEvent.Location = new System.Drawing.Point(110, 33);
             this.cmbFilterEvent.Name = "cmbFilterEvent";
-            this.cmbFilterEvent.Size = new System.Drawing.Size(320, 25);
+            this.cmbFilterEvent.Size = new System.Drawing.Size(260, 25);
             this.cmbFilterEvent.TabIndex = 1;
             this.cmbFilterEvent.SelectedIndexChanged += new System.EventHandler(this.cmbFilterEvent_SelectedIndexChanged);
             // 
+            // lblFilterStudent
+            // 
+            this.lblFilterStudent.AutoSize = true;
+            this.lblFilterStudent.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.lblFilterStudent.ForeColor = System.Drawing.Color.FromArgb(46, 42, 53);
+            this.lblFilterStudent.Location = new System.Drawing.Point(400, 36);
+            this.lblFilterStudent.Name = "lblFilterStudent";
+            this.lblFilterStudent.Size = new System.Drawing.Size(56, 17);
+            this.lblFilterStudent.TabIndex = 2;
+            this.lblFilterStudent.Text = "Student";
+            // 
+            // cmbFilterStudent
+            // 
+            this.cmbFilterStudent.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbFilterStudent.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.cmbFilterStudent.FormattingEnabled = true;
+            this.cmbFilterStudent.Location = new System.Drawing.Point(480, 33);
+            this.cmbFilterStudent.Name = "cmbFilterStudent";
+            this.cmbFilterStudent.Size = new System.Drawing.Size(260, 25);
+            this.cmbFilterStudent.TabIndex = 3;
+            this.cmbFilterStudent.SelectedIndexChanged += new System.EventHandler(this.cmbFilterStudent_SelectedIndexChanged);
+            // 
+            // btnClearFilter
+            // 
+            this.btnClearFilter.Location = new System.Drawing.Point(890, 31);
+            this.btnClearFilter.Name = "btnClearFilter";
+            this.btnClearFilter.Size = new System.Drawing.Size(110, 30);
+            this.btnClearFilter.TabIndex = 5;
+            this.btnClearFilter.Text = "Show All";
+            this.btnClearFilter.UseVisualStyleBackColor = false;
+            this.btnClearFilter.Click += new System.EventHandler(this.btnClearFilter_Click);
+            // 
             // btnRefresh
             // 
-            this.btnRefresh.Location = new System.Drawing.Point(490, 31);
+            this.btnRefresh.Location = new System.Drawing.Point(770, 31);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(110, 30);
-            this.btnRefresh.TabIndex = 2;
+            this.btnRefresh.TabIndex = 4;
             this.btnRefresh.Text = "Refresh";
             this.btnRefresh.UseVisualStyleBackColor = false;
             this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
@@ -298,6 +336,9 @@ namespace CollegeEventManagementSystem.Forms
         private System.Windows.Forms.GroupBox grpFilter;
         private System.Windows.Forms.Label lblFilter;
         private System.Windows.Forms.ComboBox cmbFilterEvent;
+        private System.Windows.Forms.Label lblFilterStudent;
+        private System.Windows.Forms.ComboBox cmbFilterStudent;
+        private System.Windows.Forms.Button btnClearFilter;
         private System.Windows.Forms.Button btnRefresh;
         private System.Windows.Forms.Panel pnlGrid;
         private System.Windows.Forms.DataGridView dgvParticipants;

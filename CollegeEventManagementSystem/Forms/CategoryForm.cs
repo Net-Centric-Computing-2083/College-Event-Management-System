@@ -73,6 +73,22 @@ namespace CollegeEventManagementSystem.Forms
             return true;
         }
 
+        /// <summary>
+        /// Checks whether another category with the same name already exists, so the
+        /// same category can never be added twice.
+        /// </summary>
+        private bool IsDuplicateCategory(string categoryName, int ignoreCategoryId)
+        {
+            string sql = "SELECT COUNT(*) FROM Categories " +
+                         "WHERE CategoryName = @CategoryName AND CategoryID <> @CategoryID";
+
+            int count = DatabaseHelper.GetCount(sql,
+                DatabaseHelper.Param("@CategoryName", categoryName),
+                DatabaseHelper.Param("@CategoryID", ignoreCategoryId));
+
+            return count > 0;
+        }
+
         private void btnAdd_Click(object sender, EventArgs e)
         {
             if (!IsInputValid())
@@ -82,6 +98,14 @@ namespace CollegeEventManagementSystem.Forms
 
             try
             {
+                if (IsDuplicateCategory(txtCategoryName.Text.Trim(), 0))
+                {
+                    MessageBox.Show("This category name already exists. Please use a different name.",
+                        "Duplicate Category", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtCategoryName.Focus();
+                    return;
+                }
+
                 string sql = "INSERT INTO Categories (CategoryName, Description) VALUES (@CategoryName, @Description)";
 
                 DatabaseHelper.ExecuteNonQuery(sql,
@@ -131,6 +155,14 @@ namespace CollegeEventManagementSystem.Forms
 
             try
             {
+                if (IsDuplicateCategory(txtCategoryName.Text.Trim(), selectedCategoryId))
+                {
+                    MessageBox.Show("This category name already exists. Please use a different name.",
+                        "Duplicate Category", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtCategoryName.Focus();
+                    return;
+                }
+
                 string sql = "UPDATE Categories SET CategoryName = @CategoryName, Description = @Description " +
                              "WHERE CategoryID = @CategoryID";
 

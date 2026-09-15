@@ -29,6 +29,7 @@ namespace CollegeEventManagementSystem.Forms
             Theme.StyleDangerButton(btnDelete);
             Theme.StyleSecondaryButton(btnClear);
             Theme.StyleSecondaryButton(btnRefresh);
+            Theme.StyleSecondaryButton(btnClearFilter);
             Theme.StyleGrid(dgvParticipants);
         }
 
@@ -38,7 +39,7 @@ namespace CollegeEventManagementSystem.Forms
 
             LoadEvents();
             LoadStudents();
-            LoadParticipants(0);
+            LoadParticipants(0, 0);
 
             if (cmbEvent.Items.Count == 0)
             {
@@ -91,32 +92,52 @@ namespace CollegeEventManagementSystem.Forms
             }
         }
 
-        /// <summary>Fills the student ComboBox.</summary>
+        /// <summary>Fills the student ComboBox and the student filter ComboBox.</summary>
         private void LoadStudents()
         {
             try
             {
+                isLoadingCombos = true;
+
                 // Select FullName from DB but alias to StudentName to keep UI code unchanged
                 string sql = "SELECT StudentID, FullName AS StudentName FROM Students ORDER BY FullName";
+                DataTable students = DatabaseHelper.GetDataTable(sql);
 
                 cmbStudent.DisplayMember = "StudentName";
                 cmbStudent.ValueMember = "StudentID";
-                cmbStudent.DataSource = DatabaseHelper.GetDataTable(sql);
+                cmbStudent.DataSource = students;
                 cmbStudent.SelectedIndex = -1;
+
+                // A copy of the same list with one extra row is used for the filter,
+                // so the user can also choose to see the participants of every student.
+                DataTable filterStudents = students.Copy();
+                DataRow allRow = filterStudents.NewRow();
+                allRow["StudentID"] = 0;
+                allRow["StudentName"] = "All Students";
+                filterStudents.Rows.InsertAt(allRow, 0);
+
+                cmbFilterStudent.DisplayMember = "StudentName";
+                cmbFilterStudent.ValueMember = "StudentID";
+                cmbFilterStudent.DataSource = filterStudents;
+                cmbFilterStudent.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Unable to load the student list.\n\nError: " + ex.Message, "Database Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                isLoadingCombos = false;
+            }
         }
 
         /// <summary>
         /// Loads the participant records with a JOIN query.
-        /// When eventId is 0 all participants are shown, otherwise only the
-        /// participants of the selected event.
+        /// The list can be filtered by event, by student, or by both at the same time.
+        /// A value of 0 means "all", so one single parameterized query is enough.
         /// </summary>
-        private void LoadParticipants(int eventId)
+        private void LoadParticipants(int eventId, int studentId)
         {
             try
             {
@@ -125,20 +146,14 @@ namespace CollegeEventManagementSystem.Forms
                     "p.EventID, p.StudentID " +
                     "FROM Participants p " +
                     "INNER JOIN Students s ON p.StudentID = s.StudentID " +
-                    "INNER JOIN Events e ON p.EventID = e.EventID ";
+                    "INNER JOIN Events e ON p.EventID = e.EventID " +
+                    "WHERE (@EventID = 0 OR p.EventID = @EventID) " +
+                    "AND (@StudentID = 0 OR p.StudentID = @StudentID) " +
+                    "ORDER BY e.EventName, s.FullName";
 
-                DataTable table;
-
-                if (eventId > 0)
-                {
-                    sql = sql + "WHERE p.EventID = @EventID ORDER BY s.FullName";
-                    table = DatabaseHelper.GetDataTable(sql, DatabaseHelper.Param("@EventID", eventId));
-                }
-                else
-                {
-                    sql = sql + "ORDER BY e.EventName, s.FullName";
-                    table = DatabaseHelper.GetDataTable(sql);
-                }
+                DataTable table = DatabaseHelper.GetDataTable(sql,
+                    DatabaseHelper.Param("@EventID", eventId),
+                    DatabaseHelper.Param("@StudentID", studentId));
 
                 dgvParticipants.DataSource = table;
 
@@ -154,6 +169,8 @@ namespace CollegeEventManagementSystem.Forms
                 dgvParticipants.Columns["EventID"].Visible = false;
                 dgvParticipants.Columns["StudentID"].Visible = false;
                 dgvParticipants.ClearSelection();
+
+                grpFilter.Text = "Filter Participants  (" + table.Rows.Count.ToString() + " records)";
             }
             catch (Exception ex)
             {
@@ -201,6 +218,43 @@ namespace CollegeEventManagementSystem.Forms
             return count > 0;
         }
 
+        /// <summary>Reads the date of one event from the database.</summary>
+        private DateTime? GetEventDate(int eventId)
+        {
+            object value = DatabaseHelper.ExecuteScalar(
+                "SELECT EventDate FROM Events WHERE EventID = @EventID",
+                DatabaseHelper.Param("@EventID", eventId));
+
+            if (value == null || value == DBNull.Value)
+            {
+                return null;
+            }
+
+            return Convert.ToDateTime(value);
+        }
+
+        /// <summary>
+        /// Keeps the participant data consistent with the event: registering a student
+        /// after the event is already over is unusual, so the user has to confirm it.
+        /// </summary>
+        private bool IsRegistrationDateAccepted(int eventId)
+        {
+            DateTime? eventDate = GetEventDate(eventId);
+
+            if (eventDate == null || dtpRegistrationDate.Value.Date <= eventDate.Value.Date)
+            {
+                return true;
+            }
+
+            DialogResult answer = MessageBox.Show(
+                "This event took place on " + eventDate.Value.ToString("dd MMM yyyy") +
+                ", which is before the selected registration date.\n\n" +
+                "Do you still want to save this registration?",
+                "Check the Dates", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            return answer == DialogResult.Yes;
+        }
+
         private void btnRegister_Click(object sender, EventArgs e)
         {
             if (!IsInputValid())
@@ -217,6 +271,11 @@ namespace CollegeEventManagementSystem.Forms
                 {
                     MessageBox.Show("This student is already registered for the selected event.",
                         "Duplicate Registration", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!IsRegistrationDateAccepted(eventId))
+                {
                     return;
                 }
 
@@ -277,6 +336,11 @@ namespace CollegeEventManagementSystem.Forms
                 {
                     MessageBox.Show("This student is already registered for the selected event.",
                         "Duplicate Registration", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!IsRegistrationDateAccepted(eventId))
+                {
                     return;
                 }
 
@@ -387,22 +451,58 @@ namespace CollegeEventManagementSystem.Forms
             RefreshGrid();
         }
 
-        /// <summary>Reloads the grid using the event chosen in the filter ComboBox.</summary>
-        private void RefreshGrid()
+        private void cmbFilterStudent_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int filterEventId = 0;
-
-            if (cmbFilterEvent.SelectedValue != null)
+            if (isLoadingCombos)
             {
-                int parsedId;
-
-                if (int.TryParse(cmbFilterEvent.SelectedValue.ToString(), out parsedId))
-                {
-                    filterEventId = parsedId;
-                }
+                return;
             }
 
-            LoadParticipants(filterEventId);
+            RefreshGrid();
+        }
+
+        /// <summary>Removes both filters and shows every participant record again.</summary>
+        private void btnClearFilter_Click(object sender, EventArgs e)
+        {
+            isLoadingCombos = true;
+
+            if (cmbFilterEvent.Items.Count > 0)
+            {
+                cmbFilterEvent.SelectedIndex = 0;
+            }
+
+            if (cmbFilterStudent.Items.Count > 0)
+            {
+                cmbFilterStudent.SelectedIndex = 0;
+            }
+
+            isLoadingCombos = false;
+
+            RefreshGrid();
+        }
+
+        /// <summary>Reloads the grid using the event and the student chosen in the filters.</summary>
+        private void RefreshGrid()
+        {
+            LoadParticipants(GetFilterValue(cmbFilterEvent), GetFilterValue(cmbFilterStudent));
+        }
+
+        /// <summary>Reads the ID selected in a filter ComboBox (0 means "show all").</summary>
+        private int GetFilterValue(ComboBox filterCombo)
+        {
+            if (filterCombo.SelectedValue == null)
+            {
+                return 0;
+            }
+
+            int parsedId;
+
+            if (int.TryParse(filterCombo.SelectedValue.ToString(), out parsedId))
+            {
+                return parsedId;
+            }
+
+            return 0;
         }
 
         private void ClearForm()

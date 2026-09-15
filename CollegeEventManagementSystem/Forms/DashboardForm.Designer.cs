@@ -33,6 +33,13 @@ namespace CollegeEventManagementSystem.Forms
             this.pnlCertificatesCard = new System.Windows.Forms.Panel();
             this.lblCertificatesValue = new System.Windows.Forms.Label();
             this.lblCertificatesCaption = new System.Windows.Forms.Label();
+            this.pnlFilter = new System.Windows.Forms.Panel();
+            this.lblDateRange = new System.Windows.Forms.Label();
+            this.dtpFromDate = new System.Windows.Forms.DateTimePicker();
+            this.lblToDate = new System.Windows.Forms.Label();
+            this.dtpToDate = new System.Windows.Forms.DateTimePicker();
+            this.btnShowRange = new System.Windows.Forms.Button();
+            this.btnResetRange = new System.Windows.Forms.Button();
             this.pnlGrid = new System.Windows.Forms.Panel();
             this.dgvUpcomingEvents = new System.Windows.Forms.DataGridView();
             this.lblUpcoming = new System.Windows.Forms.Label();
@@ -42,6 +49,7 @@ namespace CollegeEventManagementSystem.Forms
             this.pnlStudentsCard.SuspendLayout();
             this.pnlParticipantsCard.SuspendLayout();
             this.pnlCertificatesCard.SuspendLayout();
+            this.pnlFilter.SuspendLayout();
             this.pnlGrid.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvUpcomingEvents)).BeginInit();
             this.SuspendLayout();
@@ -223,16 +231,91 @@ namespace CollegeEventManagementSystem.Forms
             this.lblCertificatesValue.TabIndex = 1;
             this.lblCertificatesValue.Text = "0";
             // 
+            // pnlFilter
+            // 
+            this.pnlFilter.BackColor = System.Drawing.Color.White;
+            this.pnlFilter.Controls.Add(this.btnResetRange);
+            this.pnlFilter.Controls.Add(this.btnShowRange);
+            this.pnlFilter.Controls.Add(this.dtpToDate);
+            this.pnlFilter.Controls.Add(this.lblToDate);
+            this.pnlFilter.Controls.Add(this.dtpFromDate);
+            this.pnlFilter.Controls.Add(this.lblDateRange);
+            this.pnlFilter.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlFilter.Location = new System.Drawing.Point(0, 184);
+            this.pnlFilter.Name = "pnlFilter";
+            this.pnlFilter.Size = new System.Drawing.Size(1024, 62);
+            this.pnlFilter.TabIndex = 2;
+            // 
+            // lblDateRange
+            // 
+            this.lblDateRange.AutoSize = true;
+            this.lblDateRange.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.lblDateRange.ForeColor = System.Drawing.Color.FromArgb(46, 42, 53);
+            this.lblDateRange.Location = new System.Drawing.Point(16, 21);
+            this.lblDateRange.Name = "lblDateRange";
+            this.lblDateRange.Size = new System.Drawing.Size(184, 17);
+            this.lblDateRange.TabIndex = 0;
+            this.lblDateRange.Text = "Show upcoming events from";
+            // 
+            // dtpFromDate
+            // 
+            this.dtpFromDate.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.dtpFromDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dtpFromDate.Location = new System.Drawing.Point(206, 18);
+            this.dtpFromDate.Name = "dtpFromDate";
+            this.dtpFromDate.Size = new System.Drawing.Size(150, 25);
+            this.dtpFromDate.TabIndex = 1;
+            // 
+            // lblToDate
+            // 
+            this.lblToDate.AutoSize = true;
+            this.lblToDate.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.lblToDate.ForeColor = System.Drawing.Color.FromArgb(46, 42, 53);
+            this.lblToDate.Location = new System.Drawing.Point(368, 21);
+            this.lblToDate.Name = "lblToDate";
+            this.lblToDate.Size = new System.Drawing.Size(20, 17);
+            this.lblToDate.TabIndex = 2;
+            this.lblToDate.Text = "to";
+            // 
+            // dtpToDate
+            // 
+            this.dtpToDate.Font = new System.Drawing.Font("Segoe UI", 9.75F);
+            this.dtpToDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dtpToDate.Location = new System.Drawing.Point(396, 18);
+            this.dtpToDate.Name = "dtpToDate";
+            this.dtpToDate.Size = new System.Drawing.Size(150, 25);
+            this.dtpToDate.TabIndex = 3;
+            // 
+            // btnShowRange
+            // 
+            this.btnShowRange.Location = new System.Drawing.Point(562, 16);
+            this.btnShowRange.Name = "btnShowRange";
+            this.btnShowRange.Size = new System.Drawing.Size(110, 30);
+            this.btnShowRange.TabIndex = 4;
+            this.btnShowRange.Text = "Show";
+            this.btnShowRange.UseVisualStyleBackColor = false;
+            this.btnShowRange.Click += new System.EventHandler(this.btnShowRange_Click);
+            // 
+            // btnResetRange
+            // 
+            this.btnResetRange.Location = new System.Drawing.Point(682, 16);
+            this.btnResetRange.Name = "btnResetRange";
+            this.btnResetRange.Size = new System.Drawing.Size(110, 30);
+            this.btnResetRange.TabIndex = 5;
+            this.btnResetRange.Text = "Reset";
+            this.btnResetRange.UseVisualStyleBackColor = false;
+            this.btnResetRange.Click += new System.EventHandler(this.btnResetRange_Click);
+            // 
             // pnlGrid
             // 
             this.pnlGrid.Controls.Add(this.dgvUpcomingEvents);
             this.pnlGrid.Controls.Add(this.lblUpcoming);
             this.pnlGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlGrid.Location = new System.Drawing.Point(0, 184);
+            this.pnlGrid.Location = new System.Drawing.Point(0, 246);
             this.pnlGrid.Name = "pnlGrid";
             this.pnlGrid.Padding = new System.Windows.Forms.Padding(16, 0, 16, 16);
-            this.pnlGrid.Size = new System.Drawing.Size(1024, 456);
-            this.pnlGrid.TabIndex = 2;
+            this.pnlGrid.Size = new System.Drawing.Size(1024, 394);
+            this.pnlGrid.TabIndex = 3;
             // 
             // lblUpcoming
             // 
@@ -260,6 +343,7 @@ namespace CollegeEventManagementSystem.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1024, 640);
             this.Controls.Add(this.pnlGrid);
+            this.Controls.Add(this.pnlFilter);
             this.Controls.Add(this.pnlCards);
             this.Controls.Add(this.pnlTitle);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F);
@@ -277,6 +361,8 @@ namespace CollegeEventManagementSystem.Forms
             this.pnlParticipantsCard.PerformLayout();
             this.pnlCertificatesCard.ResumeLayout(false);
             this.pnlCertificatesCard.PerformLayout();
+            this.pnlFilter.ResumeLayout(false);
+            this.pnlFilter.PerformLayout();
             this.pnlGrid.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvUpcomingEvents)).EndInit();
             this.ResumeLayout(false);
@@ -300,6 +386,13 @@ namespace CollegeEventManagementSystem.Forms
         private System.Windows.Forms.Panel pnlCertificatesCard;
         private System.Windows.Forms.Label lblCertificatesCaption;
         private System.Windows.Forms.Label lblCertificatesValue;
+        private System.Windows.Forms.Panel pnlFilter;
+        private System.Windows.Forms.Label lblDateRange;
+        private System.Windows.Forms.DateTimePicker dtpFromDate;
+        private System.Windows.Forms.Label lblToDate;
+        private System.Windows.Forms.DateTimePicker dtpToDate;
+        private System.Windows.Forms.Button btnShowRange;
+        private System.Windows.Forms.Button btnResetRange;
         private System.Windows.Forms.Panel pnlGrid;
         private System.Windows.Forms.Label lblUpcoming;
         private System.Windows.Forms.DataGridView dgvUpcomingEvents;
