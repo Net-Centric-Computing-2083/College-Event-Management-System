@@ -2,27 +2,7 @@
    College Event Management System
    Database script for Microsoft SQL Server
 
-   HOW TO RUN
-   1. Open SQL Server Management Studio (SSMS).
-   2. Open this file.
-   3. Make sure the current database at the top of SSMS is "master".
-   4. Press Execute (F5).
-
-   The script creates the database, all seven tables, the keys, the
-   constraints and a small amount of sample data for the demonstration.
    ============================================================================ */
-
-USE master;
-GO
-
-/* Remove the old database if it already exists, so the script can be
-   executed again from the beginning without any error. */
-IF DB_ID('CollegeEventDB') IS NOT NULL
-BEGIN
-    ALTER DATABASE CollegeEventDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE CollegeEventDB;
-END
-GO
 
 CREATE DATABASE CollegeEventDB;
 GO
@@ -30,10 +10,10 @@ GO
 USE CollegeEventDB;
 GO
 
-/* ============================================================================
+/* 
    TABLE 1: Categories
-   One category (Technical, Cultural, ...) can be used by many events.
-   ============================================================================ */
+  
+   */
 CREATE TABLE Categories
 (
     CategoryID   INT IDENTITY(1,1) NOT NULL,
@@ -44,10 +24,10 @@ CREATE TABLE Categories
 );
 GO
 
-/* ============================================================================
+/* 
    TABLE 2: Venues
-   Capacity can never be zero or a negative number (CHECK constraint).
-   ============================================================================ */
+
+    */
 CREATE TABLE Venues
 (
     VenueID   INT IDENTITY(1,1) NOT NULL,
@@ -59,10 +39,10 @@ CREATE TABLE Venues
 );
 GO
 
-/* ============================================================================
+/* 
    TABLE 3: Students
-   Student details are stored only once here and are reused by Participants.
-   ============================================================================ */
+
+  */
 CREATE TABLE Students
 (
     StudentID   INT IDENTITY(1,1) NOT NULL,
@@ -76,11 +56,9 @@ CREATE TABLE Students
 );
 GO
 
-/* ============================================================================
+/* 
    TABLE 4: Events
-   CategoryID and VenueID are foreign keys, so an event can never point to a
-   category or a venue that does not exist.
-   ============================================================================ */
+ */
 CREATE TABLE Events
 (
     EventID     INT IDENTITY(1,1) NOT NULL,
@@ -95,12 +73,9 @@ CREATE TABLE Events
 );
 GO
 
-/* ============================================================================
+/* 
    TABLE 5: Participants
-   This table connects one student with one event.
-   The UNIQUE constraint stops the same student from being registered twice
-   for the same event.
-   ============================================================================ */
+   */
 CREATE TABLE Participants
 (
     ParticipantID    INT IDENTITY(1,1) NOT NULL,
@@ -114,11 +89,9 @@ CREATE TABLE Participants
 );
 GO
 
-/* ============================================================================
+/* 
    TABLE 6: Attendance
-   Attendance is recorded for a participant, not directly for a student,
-   because a student can take part in more than one event.
-   ============================================================================ */
+*/
 CREATE TABLE Attendance
 (
     AttendanceID   INT IDENTITY(1,1) NOT NULL,
@@ -132,10 +105,9 @@ CREATE TABLE Attendance
 );
 GO
 
-/* ============================================================================
+/* 
    TABLE 7: Certificates
-   Every certificate number must be unique in the whole college.
-   ============================================================================ */
+   */
 CREATE TABLE Certificates
 (
     CertificateID   INT IDENTITY(1,1) NOT NULL,
@@ -149,11 +121,9 @@ CREATE TABLE Certificates
 );
 GO
 
-/* ============================================================================
+/*
    INDEXES
-   The foreign key columns are used in almost every JOIN query of the
-   application, so a small index on each of them keeps the searches fast.
-   ============================================================================ */
+   */
 CREATE INDEX IX_Events_CategoryID ON Events(CategoryID);
 CREATE INDEX IX_Events_VenueID ON Events(VenueID);
 CREATE INDEX IX_Participants_EventID ON Participants(EventID);
@@ -164,7 +134,7 @@ GO
 
 /* ============================================================================
    SAMPLE DATA
-   All names below are fictional and are used only for the demonstration.
+   
    ============================================================================ */
 
 INSERT INTO Categories (CategoryName, Description) VALUES
@@ -192,8 +162,7 @@ INSERT INTO Students (FullName, Email, Phone, Program, Semester) VALUES
 ('Sarita Magar',     'sarita.magar@example.com',     '9801000008', 'BBA',      1);  -- StudentID 8
 GO
 
-/* The event dates are calculated from today's date, so the application always
-   has both finished events and upcoming events for the demonstration. */
+
 INSERT INTO Events (EventName, CategoryID, VenueID, EventDate, Description) VALUES
 ('Technical Symposium',     1, 1, DATEADD(DAY, -20, CAST(GETDATE() AS DATE)), 'Project exhibition and technical paper presentation'), -- EventID 1
 ('Annual Sports Day',       3, 4, DATEADD(DAY, -10, CAST(GETDATE() AS DATE)), 'Athletics, football and volleyball competitions'),     -- EventID 2
@@ -237,10 +206,6 @@ INSERT INTO Certificates (ParticipantID, CertificateNo, CertificateType, IssueDa
 (6, 'CERT-2005', 'Runner-up',     DATEADD(DAY,  -8, CAST(GETDATE() AS DATE)));
 GO
 
-/* ============================================================================
-   QUICK CHECK
-   These SELECT statements show that the sample data was inserted correctly.
-   ============================================================================ */
 SELECT 'Categories' AS TableName, COUNT(*) AS TotalRows FROM Categories
 UNION ALL SELECT 'Venues',       COUNT(*) FROM Venues
 UNION ALL SELECT 'Students',     COUNT(*) FROM Students
