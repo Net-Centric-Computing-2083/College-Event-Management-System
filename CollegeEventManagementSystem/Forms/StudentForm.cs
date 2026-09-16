@@ -180,7 +180,16 @@ namespace CollegeEventManagementSystem.Forms
 
             string email = txtEmail.Text.Trim();
 
-            if (email.Length > 0 && !Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$"))
+            // Email is required
+            if (email.Length == 0)
+            {
+                MessageBox.Show("Please enter the student email.", "Validation",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtEmail.Focus();
+                return false;
+            }
+
+            if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$"))
             {
                 MessageBox.Show("Please enter a valid email address, for example student@example.com.",
                     "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);

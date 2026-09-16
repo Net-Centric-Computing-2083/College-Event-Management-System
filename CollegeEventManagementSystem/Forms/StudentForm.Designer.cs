@@ -128,9 +128,9 @@ namespace CollegeEventManagementSystem.Forms
             this.lblEmail.ForeColor = System.Drawing.Color.FromArgb(46, 42, 53);
             this.lblEmail.Location = new System.Drawing.Point(460, 38);
             this.lblEmail.Name = "lblEmail";
-            this.lblEmail.Size = new System.Drawing.Size(41, 17);
+            this.lblEmail.Size = new System.Drawing.Size(60, 17);
             this.lblEmail.TabIndex = 2;
-            this.lblEmail.Text = "Email";
+            this.lblEmail.Text = "Email *";
             // 
             // txtEmail
             // 
